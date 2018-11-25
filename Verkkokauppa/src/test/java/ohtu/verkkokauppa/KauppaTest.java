@@ -96,7 +96,7 @@ public class KauppaTest {
     @Test
     public void ostoksenPaatyttyaRiittavallaJaLoppuunmyydyllaTuotteellaPankinMetodiaTilisiirtoKutsutaanOikein() {
         //Varasto
-        when(varasto.saldo(2)).thenReturn(0); 
+        when(varasto.saldo(2)).thenReturn(0);
         when(varasto.haeTuote(2)).thenReturn(new Tuote(2, "kalja", 6));
         
         //Ostokset
@@ -107,5 +107,72 @@ public class KauppaTest {
         
         //Varmistus
         verify(pankki).tilisiirto(eq("pekka"), anyInt(), eq("12345"), anyString(), eq(5));  
+    }
+    
+    /*  varmistettava, että metodin aloitaAsiointi kutsuminen nollaa edellisen
+        ostoksen tiedot (eli edellisen ostoksen hinta ei näy uuden ostoksen
+        hinnassa), katso tarvittaessa apua projektin MockitoDemo testeistä! */
+    @Test
+    public void kaupanMetodiAloitaAsiointiNollaaEdellisenOstoksenTiedot() {
+        //Ostokset
+        kauppa.aloitaAsiointi();
+        kauppa.lisaaKoriin(1);
+        kauppa.tilimaksu("pekka", "12345");
+        
+        verify(pankki).tilisiirto(anyString(), anyInt(), anyString(), anyString(), eq(5));
+        
+        //Uusi ostos
+        kauppa.aloitaAsiointi();
+        kauppa.tilimaksu("pekka", "12345");
+        
+        //Varmistus
+        verify(pankki).tilisiirto(anyString(), anyInt(), anyString(), anyString(), eq(0));
+    }
+    
+    /*  varmistettava, että kauppa pyytää uuden viitenumeron jokaiselle
+        maksutapahtumalle, katso tarvittaessa apua projektin MockitoDemo testeistä! */
+    @Test
+    public void kaupanMetodiTilimaksuPyytaaUudenViitenumeron() {
+        //Uudet viitteet
+        when(viite.uusi()).
+                thenReturn(1).
+                thenReturn(2).
+                thenReturn(3);
+        
+        //Ostokset
+        kauppa.aloitaAsiointi();
+        kauppa.tilimaksu("pekka", "12345");
+        
+        //Varmistus
+        verify(pankki).tilisiirto(anyString(), eq(1), anyString(), anyString(), anyInt());
+        
+        //Uusi ostos
+        kauppa.aloitaAsiointi();
+        kauppa.tilimaksu("pekka", "12345");
+        
+        //Varmistus
+        verify(pankki).tilisiirto(anyString(), eq(2), anyString(), anyString(), anyInt());
+        
+        //Uusi ostos
+        kauppa.aloitaAsiointi();
+        kauppa.tilimaksu("pekka", "12345");
+        
+        //Varmistus
+        verify(pankki).tilisiirto(anyString(), eq(3), anyString(), anyString(), anyInt());
+    }
+    @Test
+    public void varastonMetodiPalautaVarastoonKutsutaanOikeallaTuotteella() {
+        //Varasto
+        Tuote tuote = new Tuote(2, "kalja", 6);
+        when(varasto.saldo(2)).thenReturn(0); 
+        when(varasto.haeTuote(2)).thenReturn(tuote);
+        
+        //Ostokset
+        kauppa.aloitaAsiointi();
+        kauppa.lisaaKoriin(2);
+        kauppa.poistaKorista(2);
+        
+        //Varmistus
+        verify(varasto).palautaVarastoon(eq(tuote));
     }
 }
