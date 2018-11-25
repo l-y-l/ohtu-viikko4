@@ -1,4 +1,4 @@
-#Retrospektiivitekniikat
+# Retrospektiivitekniikat
 
 Retrospektiivissä ohjelmistonkehittäjätiimi kokoontuu projektin tai iteraation lopussa tarkastelemaan toimintatapaansa ja pyrkii löytämään tähän parannuksia tulevaisuuteen, esimerkiksi seuraavaan iteraatioon. Retrospektiiviin on erilaisia lähestymistapoja kuten "Start, Stop, Continue, More of, Less of Wheel" sekä "Glad, Sad, Mad", ja tekniikasta sekä ryhmän koosta riippuen retrospektiivi kestää noin kymmenestä minuutista jopa kahteen tuntiin.
 
